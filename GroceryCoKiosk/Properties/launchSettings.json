@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GroceryCoKiosk": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\Jaydon\\Desktop\\myOrder.txt"
+    }
+  }
+}
