@@ -18,8 +18,6 @@ namespace GroceryCoKiosk
     public class CheckoutService : ICheckoutService
     {
 
-        private Order _customerOrder;
-
         private readonly ILogger<CheckoutService> _log;
         private readonly IConfiguration _config;
 

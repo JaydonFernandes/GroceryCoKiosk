@@ -21,6 +21,7 @@ namespace GroceryCoKiosk
 
         public List<Product> ScanItems(string items)
         {
+
             string workingDirectory = Environment.CurrentDirectory;
             string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
             string productsFile = Path.Combine(projectDirectory, "products.json");
@@ -68,5 +69,20 @@ namespace GroceryCoKiosk
 
             return products;
         }
+
+        private List<Product> GetProducts()
+        {
+
+            List<Product> items = new List<Product>();
+            using (StreamReader r = new StreamReader("products.json"))
+            {
+                string json = r.ReadToEnd();
+                items = JsonConvert.DeserializeObject<List<Product>>(json);
+            }
+            return items;
+
+        }
     }
+
+
 }
