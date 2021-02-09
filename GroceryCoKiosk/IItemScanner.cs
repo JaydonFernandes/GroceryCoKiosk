@@ -4,6 +4,6 @@ namespace GroceryCoKiosk
 {
     public interface IItemScanner
     {
-        List<Product> ScanItems(string items);
+        List<Product> ScanItems(string[] itemList);
     }
 }

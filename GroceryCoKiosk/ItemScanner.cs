@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace GroceryCoKiosk
@@ -11,28 +13,21 @@ namespace GroceryCoKiosk
     {
 
         private readonly ILogger<ItemScanner> _log;
+        private readonly IConfiguration _config;
 
-        public ItemScanner(ILogger<ItemScanner> log)
+        public ItemScanner(ILogger<ItemScanner> log, IConfiguration config)
         {
             _log = log;
+            _config = config;
         }
 
 
 
-        public List<Product> ScanItems(string items)
+        public List<Product> ScanItems(string[] itemList)
         {
-
-            string workingDirectory = Environment.CurrentDirectory;
-            string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
-            string productsFile = Path.Combine(projectDirectory, "products.json");
-            string productsText = File.ReadAllText(productsFile);
-            dynamic productData = JsonConvert.DeserializeObject<dynamic>(productsText);
-
-
-            string[] itemList = items.Split(
-                new[] { Environment.NewLine },
-                StringSplitOptions.None
-            );
+            _log.LogInformation("Scanning items.");
+            itemList = CleanInput(itemList);
+            List<Product> productData = GetProducts();
 
             List<Product> products = new List<Product>();
 
@@ -41,13 +36,12 @@ namespace GroceryCoKiosk
                 bool itemFound = false;
                 foreach (var product in productData)
                 {
-
-                    if ( (item == (string)product.name) )
+                    if ( (item == product.Name) )
                     {
                         try
                         {
-                            Product scannedItem = new Product((string)product.name, (decimal)product.price, (decimal)product.discount);
-                            _log.LogInformation($"Item scanned: {item}");
+                            Product scannedItem = product;
+                            _log.LogInformation("Item scanned: {item}", item);
                             products.Add(scannedItem);
                             itemFound = true;
                         }
@@ -56,31 +50,47 @@ namespace GroceryCoKiosk
                             _log.LogError("{Type} when scanning item: {Item}. {Message} {StackTrace}", ex.GetType(), item, ex.Message, ex.StackTrace);
                             throw;
                         }
-
                     }
                 }
                 if (!itemFound)
                 {
-                    Exception ex = new KeyNotFoundException($"Unable to match item: {item} in product database.");
+                    Exception ex = new KeyNotFoundException($"Unable to match item: [{item}] in product database.");
                     _log.LogError("{Type} when scanning item: {Item}. {Message}", ex.GetType(), item, ex.Message);
                     throw ex;
                 }
             }
-
+            _log.LogInformation("Scanning complete.");
             return products;
         }
 
         private List<Product> GetProducts()
         {
-
             List<Product> items = new List<Product>();
-            using (StreamReader r = new StreamReader("products.json"))
+            using (StreamReader r = new StreamReader(_config.GetValue<string>("DataLocation")))  //Getting product data from local json file set in appsettings.json.
             {
                 string json = r.ReadToEnd();
-                items = JsonConvert.DeserializeObject<List<Product>>(json);
+
+                try
+                {
+                    items = JsonConvert.DeserializeObject<List<Product>>(json);
+                }
+                catch (Exception)
+                {
+                    _log.LogError("Could not deserialize json object to a valid Product object.");
+                    throw;
+                }
+                
             }
             return items;
+        }
 
+        private string[] CleanInput(string[] input)
+        {
+            for (int i = 0; i < input.Length; i++)
+            {
+                input[i] = input[i].Trim();
+            }
+            return input.Where(o => (o != "")).ToArray();
         }
     }
 

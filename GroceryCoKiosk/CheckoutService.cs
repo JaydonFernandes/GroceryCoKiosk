@@ -12,12 +12,10 @@ namespace GroceryCoKiosk
         public decimal Discount;
         public int Quantity;
         public decimal ItemTotal;
-
     }
 
     public class CheckoutService : ICheckoutService
     {
-
         private readonly ILogger<CheckoutService> _log;
         private readonly IConfiguration _config;
 
@@ -29,7 +27,7 @@ namespace GroceryCoKiosk
 
         public void Checkout(Order order)
         {
-            // create a hash map of the orders items
+            _log.LogInformation("Starting Transaction.");
             Hashtable productHash = new Hashtable();
 
             foreach (Product product in order.Products)
@@ -54,14 +52,14 @@ namespace GroceryCoKiosk
 
                     productHash.Add(product.Name, productReceipt);
                 }
-
-                
             }
-
+            _log.LogInformation("Order total: ${OrderTotal}.", order.SubTotal-order.Discount);
+            _log.LogInformation("Printing receipt.");
             PrintItemizedReceipt(productHash);
+            _log.LogInformation("Transaction complete.");
         }
 
-        public void PrintItemizedReceipt(Hashtable productHash)
+        private void PrintItemizedReceipt(Hashtable productHash)
         {
             DateTime localDate = DateTime.Now;
             decimal subtotal = 0;
@@ -103,6 +101,7 @@ namespace GroceryCoKiosk
             Console.WriteLine();
             Console.WriteLine(" Thank you for shopping at GroceryCo. ");
             Console.WriteLine("++++++++++++++++++++++++++++++++++++++");
+            Console.WriteLine();
         }
 
     }
