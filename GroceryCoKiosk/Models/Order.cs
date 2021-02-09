@@ -13,7 +13,6 @@ namespace GroceryCoKiosk
         public Order(List<Product> products)
         {
             Products = products;
-
             foreach (Product product in products)
             {
                 SubTotal += product.Price;

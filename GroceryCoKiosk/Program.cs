@@ -5,7 +5,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace GroceryCoKiosk
 {
@@ -28,7 +27,6 @@ namespace GroceryCoKiosk
             );
 
             List<Product> products = new List<Product>(); 
-
             try
             {
                 products = itemScanner.ScanItems(fileContents);
@@ -43,7 +41,6 @@ namespace GroceryCoKiosk
                 Order order = new Order(products);
                 checkoutSvc.Checkout(order);
             }
-            
         }
 
         static void BuildConfig(IConfigurationBuilder builder)

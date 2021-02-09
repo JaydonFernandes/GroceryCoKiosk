@@ -22,7 +22,6 @@ namespace GroceryCoKiosk
         }
 
 
-
         public List<Product> ScanItems(string[] itemList)
         {
             _log.LogInformation("Scanning items.");
@@ -36,11 +35,11 @@ namespace GroceryCoKiosk
                 bool itemFound = false;
                 foreach (var product in productData)
                 {
-                    if ( (item == product.Name) )
+                    if ((item == product.Name))
                     {
                         try
                         {
-                            Product scannedItem = product;
+                            Product scannedItem = product;//////////////
                             _log.LogInformation("Item scanned: {item}", item);
                             products.Add(scannedItem);
                             itemFound = true;
@@ -79,7 +78,7 @@ namespace GroceryCoKiosk
                     _log.LogError("Could not deserialize json object to a valid Product object.");
                     throw;
                 }
-                
+
             }
             return items;
         }

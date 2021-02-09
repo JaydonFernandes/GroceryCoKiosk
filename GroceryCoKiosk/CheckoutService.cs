@@ -34,7 +34,7 @@ namespace GroceryCoKiosk
             {
                 if (productHash.ContainsKey(product.Name))
                 {
-                    ItemReceipt itemReceipt = (ItemReceipt) productHash[product.Name];
+                    ItemReceipt itemReceipt = (ItemReceipt)productHash[product.Name];
                     itemReceipt.Price = product.Price;
                     itemReceipt.Quantity++;
                     itemReceipt.Discount += product.Discount;
@@ -53,7 +53,7 @@ namespace GroceryCoKiosk
                     productHash.Add(product.Name, productReceipt);
                 }
             }
-            _log.LogInformation("Order total: ${OrderTotal}.", order.SubTotal-order.Discount);
+            _log.LogInformation("Order processed. Subtotal: {OrderSubtotal}, Discount: {OrderDiscount}, Total: ${OrderTotal}.", order.SubTotal, order.Discount, (order.SubTotal-order.Discount) );
             _log.LogInformation("Printing receipt.");
             PrintItemizedReceipt(productHash);
             _log.LogInformation("Transaction complete.");
