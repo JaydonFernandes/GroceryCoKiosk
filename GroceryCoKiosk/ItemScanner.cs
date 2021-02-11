@@ -1,95 +1,57 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using GroceryCoKiosk.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace GroceryCoKiosk
 {
     public class ItemScanner : IItemScanner
     {
 
-        private readonly ILogger<ItemScanner> _log;
-        private readonly IConfiguration _config;
+        private readonly ILogger<IItemScanner> _log;
+        private readonly IKioskPrinter _kioskPrinter;
+        private readonly IDataAccessService _dataAccessService;
 
-        public ItemScanner(ILogger<ItemScanner> log, IConfiguration config)
+        public ItemScanner(ILogger<IItemScanner> log, IKioskPrinter kioskPrinter, IDataAccessService dataAccessService)
         {
             _log = log;
-            _config = config;
+            _kioskPrinter = kioskPrinter;
+            _dataAccessService = dataAccessService;
         }
 
-
-        public List<Product> ScanItems(string[] itemList)
+        public List<Product> ScanItems(string[] checkoutItemArray)
         {
             _log.LogInformation("Scanning items.");
-            itemList = CleanInput(itemList);
-            List<Product> productData = GetProducts();
+            checkoutItemArray = FormatItemArray(checkoutItemArray);
+            Hashtable productCataglog = _dataAccessService.GetProductCatalog();
+            List<Product> productsToCheckout = new List<Product>();
 
-            List<Product> products = new List<Product>();
-
-            foreach (string item in itemList)
+            foreach (string checkoutItem in checkoutItemArray)
             {
-                bool itemFound = false;
-                foreach (var product in productData)
+                if (productCataglog.ContainsKey(checkoutItem))
                 {
-                    if ((item == product.Name))
-                    {
-                        try
-                        {
-                            Product scannedItem = product;//////////////
-                            _log.LogInformation("Item scanned: {item}", item);
-                            products.Add(scannedItem);
-                            itemFound = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            _log.LogError("{Type} when scanning item: {Item}. {Message} {StackTrace}", ex.GetType(), item, ex.Message, ex.StackTrace);
-                            throw;
-                        }
-                    }
+                    productsToCheckout.Add((Product)productCataglog[checkoutItem]);
+                    _log.LogInformation("Scanned item [{ScannedItem}].", checkoutItem);
                 }
-                if (!itemFound)
+                else
                 {
-                    Exception ex = new KeyNotFoundException($"Unable to match item: [{item}] in product database.");
-                    _log.LogError("{Type} when scanning item: {Item}. {Message}", ex.GetType(), item, ex.Message);
-                    throw ex;
+                    _log.LogWarning("Unable to find item [{UnknownItem}] in product catalog.",checkoutItem);
+                    _kioskPrinter.PrintLineToConsole($"Unable to find item [{checkoutItem}] in product catalog.");
                 }
             }
             _log.LogInformation("Scanning complete.");
-            return products;
+            return productsToCheckout;
         }
 
-        private List<Product> GetProducts()
+        private string[] FormatItemArray(string[] itemList)
         {
-            List<Product> items = new List<Product>();
-            using (StreamReader r = new StreamReader(_config.GetValue<string>("DataLocation")))  //Getting product data from local json file set in appsettings.json.
+            for (int i = 0; i < itemList.Length; i++)
             {
-                string json = r.ReadToEnd();
-
-                try
-                {
-                    items = JsonConvert.DeserializeObject<List<Product>>(json);
-                }
-                catch (Exception)
-                {
-                    _log.LogError("Could not deserialize json object to a valid Product object.");
-                    throw;
-                }
-
+                itemList[i] = itemList[i].Trim();
             }
-            return items;
-        }
-
-        private string[] CleanInput(string[] input)
-        {
-            for (int i = 0; i < input.Length; i++)
-            {
-                input[i] = input[i].Trim();
-            }
-            return input.Where(o => (o != "")).ToArray();
+            return itemList.Where(item => (item != "")).ToArray();
         }
     }
 

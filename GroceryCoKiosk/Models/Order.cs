@@ -19,6 +19,5 @@ namespace GroceryCoKiosk
                 Discount += product.Discount;
             }
         }
-
     }
 }

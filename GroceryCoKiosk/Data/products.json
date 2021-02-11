@@ -1,18 +1,15 @@
 [
   {
-    "id": 1,
     "name": "Apple",
     "price": 0.75,
     "discount": 0.25
   },
   {
-    "id": 2,
     "name": "Banana",
     "price": 1.00,
     "discount": 0.00
   },
   {
-    "id": 3,
     "name": "Orange",
     "price": 1.25,
     "discount": 0.20

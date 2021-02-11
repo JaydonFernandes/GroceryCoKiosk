@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using GroceryCoKiosk.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
@@ -6,7 +7,7 @@ using System.Collections;
 namespace GroceryCoKiosk
 {
 
-    struct ItemReceipt
+    public struct ProductReceipt
     {
         public decimal Price;
         public decimal Discount;
@@ -16,93 +17,61 @@ namespace GroceryCoKiosk
 
     public class CheckoutService : ICheckoutService
     {
-        private readonly ILogger<CheckoutService> _log;
-        private readonly IConfiguration _config;
+        private readonly ILogger<ICheckoutService> _log;
+        private readonly IKioskPrinter _kioskPrinter;
 
-        public CheckoutService(ILogger<CheckoutService> log, IConfiguration config)
+        public CheckoutService(ILogger<ICheckoutService> log, IKioskPrinter kioskPrinter)
         {
             _log = log;
-            _config = config;
+            _kioskPrinter = kioskPrinter;
         }
 
         public void Checkout(Order order)
         {
-            _log.LogInformation("Starting Transaction.");
-            Hashtable productHash = new Hashtable();
+            if (order.Products.Count > 0)
+            {
+                _log.LogInformation("Starting Transaction.");
+                Hashtable orderHash = HashOrder(order);
+                _log.LogInformation("Order processed. Subtotal: ${OrderSubtotal}, Discount: ${OrderDiscount}, Total: ${OrderTotal}.", order.SubTotal, order.Discount, (order.SubTotal - order.Discount));
+
+                _log.LogInformation("Printing receipt.");
+                _kioskPrinter.PrintReceipt(orderHash);
+                _log.LogInformation("Transaction complete.");
+            }
+            else
+            {
+                _log.LogWarning("Checkout attempted with empty order");
+                _kioskPrinter.PrintLineToConsole("Unable to checkout empty order.");
+            }
+        }
+
+            
+
+        private Hashtable HashOrder(Order order)
+        {
+            Hashtable orderHash = new Hashtable();
 
             foreach (Product product in order.Products)
             {
-                if (productHash.ContainsKey(product.Name))
-                {
-                    ItemReceipt itemReceipt = (ItemReceipt)productHash[product.Name];
-                    itemReceipt.Price = product.Price;
-                    itemReceipt.Quantity++;
-                    itemReceipt.Discount += product.Discount;
-                    itemReceipt.ItemTotal = (itemReceipt.Quantity * itemReceipt.Price) - itemReceipt.Discount;
+                ProductReceipt itemReceipt;
 
-                    productHash[product.Name] = itemReceipt;
+                if (orderHash.ContainsKey(product.Name))
+                {
+                    itemReceipt = (ProductReceipt)orderHash[product.Name];
+                    itemReceipt.Quantity++;
+                    itemReceipt.ItemTotal = (itemReceipt.Quantity * (itemReceipt.Price - itemReceipt.Discount));
+                    orderHash[product.Name] = itemReceipt;
                 }
                 else
                 {
-                    ItemReceipt productReceipt;
-                    productReceipt.Price = product.Price;
-                    productReceipt.Discount = product.Discount;
-                    productReceipt.Quantity = 1;
-                    productReceipt.ItemTotal = (product.Price - product.Discount);
-
-                    productHash.Add(product.Name, productReceipt);
+                    itemReceipt.Price = product.Price;
+                    itemReceipt.Discount = product.Discount;
+                    itemReceipt.Quantity = 1;
+                    itemReceipt.ItemTotal = (itemReceipt.Quantity * (itemReceipt.Price - itemReceipt.Discount));
+                    orderHash.Add(product.Name, itemReceipt);
                 }
             }
-            _log.LogInformation("Order processed. Subtotal: {OrderSubtotal}, Discount: {OrderDiscount}, Total: ${OrderTotal}.", order.SubTotal, order.Discount, (order.SubTotal-order.Discount) );
-            _log.LogInformation("Printing receipt.");
-            PrintItemizedReceipt(productHash);
-            _log.LogInformation("Transaction complete.");
+            return orderHash;
         }
-
-        private void PrintItemizedReceipt(Hashtable productHash)
-        {
-            DateTime localDate = DateTime.Now;
-            decimal subtotal = 0;
-            decimal discounts = 0;
-            int itemCount = 0;
-
-            Console.WriteLine();
-            Console.WriteLine("++++++++++++++++++++++++++++++++++++++");
-            Console.WriteLine($"{localDate.DayOfWeek} {localDate.ToString("MMMM")} {localDate.Day}, {localDate.Year}    {localDate.ToString("h:mm tt")}");
-            Console.WriteLine();
-            foreach (DictionaryEntry pair in productHash)
-            {
-                ItemReceipt item = (ItemReceipt)pair.Value;
-                subtotal += (item.Price * item.Quantity);
-                discounts += (item.Discount);
-                itemCount += item.Quantity;
-
-                Console.WriteLine(pair.Key);
-                Console.WriteLine($"        Price: ${item.Price}");
-                Console.WriteLine($"        Quantity: {item.Quantity}");
-                if (item.Discount > 0)
-                {
-                    Console.WriteLine($"        Discount: {item.Discount}");
-                }
-
-                Console.WriteLine($"        Item Total: ${item.ItemTotal}");
-                Console.WriteLine();
-
-            }
-            Console.WriteLine("======================================");
-            Console.WriteLine($"Subtotal ({itemCount} items):        ${subtotal}");
-            if (discounts > 0)
-            {
-                Console.WriteLine($"Discount:                 -${discounts}");
-            }
-            Console.WriteLine("--------------------------------------");
-            Console.WriteLine($"Total:                     ${subtotal - discounts}");
-            Console.WriteLine("======================================");
-            Console.WriteLine();
-            Console.WriteLine(" Thank you for shopping at GroceryCo. ");
-            Console.WriteLine("++++++++++++++++++++++++++++++++++++++");
-            Console.WriteLine();
-        }
-
     }
 }
