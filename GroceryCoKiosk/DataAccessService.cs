@@ -43,7 +43,6 @@ namespace GroceryCoKiosk
             }
             catch (Exception ex)
             {
-                var type = ex.GetType();
                 _log.LogError("Unable to find product catalog file. {ExceptionType} {ExceptionMessage} {ExceptionStackTrace}", ex.GetType(), ex.Message, ex.StackTrace);
                 throw;
             }
