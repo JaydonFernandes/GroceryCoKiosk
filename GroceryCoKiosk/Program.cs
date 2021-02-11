@@ -20,7 +20,7 @@ namespace GroceryCoKiosk
             SetupLogger(builder);
             var host = SetupHost();
 
-            var itemScanner = ActivatorUtilities.CreateInstance<ItemScanner>(host.Services);
+            var itemScanner = ActivatorUtilities.CreateInstance<ItemScanningService>(host.Services);
             var checkoutService = ActivatorUtilities.CreateInstance<CheckoutService>(host.Services);
             var kioskPrinter = ActivatorUtilities.CreateInstance<KioskPrinter>(host.Services);
 
@@ -93,7 +93,7 @@ namespace GroceryCoKiosk
                     services.AddSingleton<IKioskPrinter, KioskPrinter>();
 
                     services.AddTransient<ICheckoutService, CheckoutService>();
-                    services.AddTransient<IItemScanner, ItemScanner>();
+                    services.AddTransient<IItemScanningService, ItemScanningService>();
                     services.AddTransient<IDataAccessService, DataAccessService>();
                 })
                 .UseSerilog()

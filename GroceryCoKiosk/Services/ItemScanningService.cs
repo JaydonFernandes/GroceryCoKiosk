@@ -7,14 +7,14 @@ using System.Linq;
 
 namespace GroceryCoKiosk
 {
-    public class ItemScanner : IItemScanner
+    public class ItemScanningService : IItemScanningService
     {
 
-        private readonly ILogger<IItemScanner> _log;
+        private readonly ILogger<IItemScanningService> _log;
         private readonly IKioskPrinter _kioskPrinter;
         private readonly IDataAccessService _dataAccessService;
 
-        public ItemScanner(ILogger<IItemScanner> log, IKioskPrinter kioskPrinter, IDataAccessService dataAccessService)
+        public ItemScanningService(ILogger<IItemScanningService> log, IKioskPrinter kioskPrinter, IDataAccessService dataAccessService)
         {
             _log = log;
             _kioskPrinter = kioskPrinter;

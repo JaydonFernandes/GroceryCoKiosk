@@ -13,16 +13,16 @@ namespace GroceryCoKioskTest
     [TestClass]
     public class ItemScannerTests
     {
-        private readonly ItemScanner _itemScanner;
+        private readonly ItemScanningService _itemScanner;
         private static readonly Mock<IDataAccessService> _dataAccessServiceMock = new Mock<IDataAccessService>();
-        private readonly Mock<ILogger<IItemScanner>> _logMock = new Mock<ILogger<IItemScanner>>();
+        private readonly Mock<ILogger<IItemScanningService>> _logMock = new Mock<ILogger<IItemScanningService>>();
         private readonly Mock<IKioskPrinter> _kioskPrinterMock = new Mock<IKioskPrinter>();
 
         static Hashtable fakeProductCatalog;
 
         public ItemScannerTests()
         {
-            _itemScanner = new ItemScanner(_logMock.Object, _kioskPrinterMock.Object, _dataAccessServiceMock.Object);
+            _itemScanner = new ItemScanningService(_logMock.Object, _kioskPrinterMock.Object, _dataAccessServiceMock.Object);
         }
 
         [ClassInitialize]

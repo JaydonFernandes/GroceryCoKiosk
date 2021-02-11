@@ -2,7 +2,7 @@
 
 namespace GroceryCoKiosk
 {
-    public interface IItemScanner
+    public interface IItemScanningService
     {
         List<Product> ScanItems(string[] itemList);
     }
