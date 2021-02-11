@@ -24,12 +24,20 @@ namespace GroceryCoKioskTest
             _dataAccessService = new DataAccessService(_logMock.Object, _configMock.Object);
         }
 
-        private readonly static List<Product> sampleProducts = new List<Product>() {
+        private readonly static List<Product> sampleValidProducts = new List<Product>() {
                 new Product("Apple", (decimal)0.75, (decimal)0.25),
                 new Product("Banana", (decimal)1.00, (decimal)0.00),
                 new Product("Orange", (decimal)1.25, (decimal)0.20)};
 
-        private readonly string _JSONSampleCatalog = JsonConvert.SerializeObject(sampleProducts);
+        private readonly static List<Product> sampleInvalidProducts = new List<Product>() {
+                new Product("Apple", (decimal)0.75, (decimal)0.25),
+                new Product(null, 0, 0),
+                new Product("Banana", (decimal)1.00, (decimal)0.00),
+                new Product("Invalid", (decimal)-1.25, (decimal)-0.20),
+                new Product("Orange", (decimal)1.25, (decimal)0.20)};
+
+        private readonly string _JSONValidSampleCatalog = JsonConvert.SerializeObject(sampleValidProducts);
+        private readonly string _JSONInvalidSampleCatalog = JsonConvert.SerializeObject(sampleInvalidProducts);
 
         private readonly string _testCatalogFileName = "testCatalog.json";
 
@@ -43,7 +51,16 @@ namespace GroceryCoKioskTest
                 var path = Directory.GetCurrentDirectory();
                 if (!string.IsNullOrEmpty(_testCatalogFileName))
                 {
-                    File.AppendAllText(_testCatalogFileName, _JSONSampleCatalog);
+                    File.AppendAllText(_testCatalogFileName, _JSONValidSampleCatalog);
+                }
+            }
+
+            if (TestContext.TestName == "CatalogFileWithInvalidDataTest")
+            {
+                var path = Directory.GetCurrentDirectory();
+                if (!string.IsNullOrEmpty(_testCatalogFileName))
+                {
+                    File.AppendAllText(_testCatalogFileName, _JSONInvalidSampleCatalog);
                 }
             }
         }
@@ -52,6 +69,14 @@ namespace GroceryCoKioskTest
         public void TestCleanup()
         {
             if (TestContext.TestName == "ValidCatalogFileLocationTest")
+            {
+                if (!string.IsNullOrEmpty(_testCatalogFileName))
+                {
+                    File.Delete(_testCatalogFileName);
+                }
+            }
+
+            if (TestContext.TestName == "CatalogFileWithInvalidDataTest")
             {
                 if (!string.IsNullOrEmpty(_testCatalogFileName))
                 {
@@ -77,7 +102,39 @@ namespace GroceryCoKioskTest
             DataAccessService dataAccessService = new DataAccessService(_logMock.Object, testConfiguration);
 
             Hashtable expected = new Hashtable();
-            foreach (Product product in sampleProducts)
+            foreach (Product product in sampleValidProducts)
+            {
+                expected.Add(product.Name, (Product)product);
+            }
+
+            //--Act
+            Hashtable result = dataAccessService.GetProductCatalog();
+
+            //--Assert
+            Assert.AreEqual(expected.Count, result.Count);
+            foreach (DictionaryEntry expectedKV in expected)
+            {
+                result[expectedKV.Key].Should().BeEquivalentTo(expected[expectedKV.Key]);
+            }
+        }
+
+        [TestMethod]
+        public void CatalogFileWithInvalidDataTest()
+        {
+
+            //--Arrange
+            var inMemorySettings = new Dictionary<string, string> {
+                {"DataLocation", _testCatalogFileName}
+            };
+
+            IConfiguration testConfiguration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+
+            DataAccessService dataAccessService = new DataAccessService(_logMock.Object, testConfiguration);
+
+            Hashtable expected = new Hashtable();
+            foreach (Product product in sampleValidProducts)
             {
                 expected.Add(product.Name, (Product)product);
             }

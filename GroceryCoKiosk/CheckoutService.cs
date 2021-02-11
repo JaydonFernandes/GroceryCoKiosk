@@ -32,7 +32,7 @@ namespace GroceryCoKiosk
             {
                 _log.LogInformation("Starting Transaction.");
                 Hashtable orderHash = HashOrder(order);
-                _log.LogInformation("Order processed. Subtotal: ${OrderSubtotal}, Discount: ${OrderDiscount}, Total: ${OrderTotal}.", order.SubTotal, order.Discount, (order.SubTotal - order.Discount));
+                _log.LogInformation("Order processed. Subtotal: ${OrderSubtotal}, Discount: ${OrderDiscount}, Total: ${OrderTotal}.", order.SubTotal, order.TotalDiscount, (order.SubTotal - order.TotalDiscount));
 
                 _log.LogInformation("Printing receipt.");
                 _kioskPrinter.PrintReceipt(orderHash);

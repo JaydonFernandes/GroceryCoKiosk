@@ -8,7 +8,7 @@ namespace GroceryCoKiosk
     {
         public List<Product> Products { get; private set; }
         public decimal SubTotal { get; private set; }
-        public decimal Discount { get; private set; }
+        public decimal TotalDiscount { get; private set; }
 
         public Order(List<Product> products)
         {
@@ -16,7 +16,7 @@ namespace GroceryCoKiosk
             foreach (Product product in products)
             {
                 SubTotal += product.Price;
-                Discount += product.Discount;
+                TotalDiscount += product.Discount;
             }
         }
     }
