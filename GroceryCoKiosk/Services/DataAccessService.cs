@@ -49,7 +49,7 @@ namespace GroceryCoKiosk
 
             foreach (Product catalogItem in catalogItemList)
             {
-                if ( (catalogItem.Name != null) && (catalogItem.Price >= 0) && (catalogItem.Discount >= 0))
+                if ( (catalogItem.Name != null) && (catalogItem.Price >= 0) && (catalogItem.Discount >= 0 && catalogItem.Discount <= catalogItem.Price))
                 {
                     productCatalog.Add(catalogItem.Name, (Product)catalogItem);
                 }
