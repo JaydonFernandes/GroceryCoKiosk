@@ -83,5 +83,7 @@ Employs an **appsettings.json** that is pulled based on the environment that the
 #### Logger
 Added a Logger using [Serilog](https://serilog.net/) to the application that logs events of the application to the text file. The logger logs information events such an item being processed and when a transaction is complete. As well as warning and error events when the application is used in an unexpected way. This benefits the application since the logs can be used in troubleshooting and give insight into the application's usage.
 
+If the application is being run in debug, then the logs will be output to ```GroceryCoKiosk\GroceryCoKiosk\bin\Debug\netcoreapp3.1\logs.txt```.
+
 #### Automated Unit Testing with Mocks
 Utilizes automated unit testing for business logic. These tests use the [Moq](https://github.com/Moq/moq4/wiki/Quickstart) framework to create mocks such that each each test can focus on a single unit of code without having to manage external dependencies. Automated testing has the advantage of making the code easier to maintain since anytime a change is made, the automated tests can be run to ensure the program will still function as expected. These tests can also be used as a final check before deploying the code to different environments.
