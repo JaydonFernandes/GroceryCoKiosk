@@ -7,7 +7,7 @@ The program takes in the full path to a text file which represents the customer'
 
 The full path of the order text file and be set in the ```GroceryCoKiosk/GroceryCoKiosk/Properties/launchSettings.json``` file with the property name ```commandLineArgs```.
 
-An example input file could look like this;
+Example order input file contents;
 
 ```html
 Apple
@@ -16,7 +16,7 @@ Orange
 Apple
 Banana
 ```
-An example file path being placed in as a command line argument;
+Example file path being placed in as a command line argument;
 ```json
 {
   "profiles": {
