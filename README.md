@@ -5,6 +5,8 @@ GroceryCo. Kiosk is a prototype for a checkout system for customers to use in Gr
 ## Usage
 The program takes in the full path to a text file which represents the customer's order. The text file should contain an unsorted list of items where each line is a product from the customer's basket scanned at the kiosk. 
 
+The full path of the order text file and be set in the ```GroceryCoKiosk/GroceryCoKiosk/Properties/launchSettings.json``` file with the property name ```commandLineArgs```.
+
 An example input file could look like this;
 
 ```html
@@ -13,6 +15,17 @@ Orange
 Orange
 Apple
 Banana
+```
+An example file path being placed in as a command line argument;
+```json
+{
+  "profiles": {
+    "GroceryCoKiosk": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\Jaydon\\Desktop\\myOrder.txt"
+    }
+  }
+}
 ```
 
 An example output;
@@ -48,14 +61,12 @@ Total:                           $4.10
 ++++++++++++++++++++++++++++++++++++++
 ```
 
-
 The catalog of products can be set in ```GroceryCoKiosk/GroceryCoKiosk/Data/products.json```.
 The file format is a list of JSON objects where each valid object has the following fields;
 
 - **name**: Name of the product. (Must not be a null or empty string). 
 - **price**: Regular price of the product. (Must be a positive decimal).
 - **discount**: Amount to be discounted from the regular price. (Most be a positive decimal and no greater than the product's price).
-
 
 ## Design
 For this developer activity I've decided to use techniques I've learned in previous work experience that I believe would be make a program easy to extend, maintain and be production ready.
