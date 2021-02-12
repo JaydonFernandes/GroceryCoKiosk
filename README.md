@@ -7,7 +7,7 @@ The program takes in the full path to a text file which represents the customer'
 
 The full path of the order text file and be set in the ```GroceryCoKiosk/GroceryCoKiosk/Properties/launchSettings.json``` file with the property name ```commandLineArgs```.
 
-An example of the contents of an input file;
+An example input file could look like this;
 
 ```html
 Apple
@@ -65,8 +65,30 @@ The catalog of products can be set in ```GroceryCoKiosk/GroceryCoKiosk/Data/prod
 The file format is a list of JSON objects where each valid object has the following fields;
 
 - **name**: Name of the product. (Must not be a null or empty string). 
-- **price**: Regular price of the product. (Must be a positive decimal).
-- **discount**: Amount to be discounted from the regular price. (Most be a positive decimal and no greater than the product's price).
+- **price**: Regular price of the product. (Must be a non-negative decimal).
+- **discount**: Amount to be discounted from the regular price. (Most be a non-negative decimal and no greater than the product's price).
+
+Example of product catalog JSON file;
+```json
+[
+  {
+    "name": "Apple",
+    "price": 0.75,
+    "discount": 0.25
+  },
+  {
+    "name": "Banana",
+    "price": 1.00,
+    "discount": 0.00
+  },
+  {
+    "name": "Orange",
+    "price": 1.25,
+    "discount": 0.20
+  }
+]
+```
+
 
 ## Design
 For this developer activity I've decided to use techniques I've learned in previous work experience that I believe would be make a program easy to extend, maintain and be production ready.
